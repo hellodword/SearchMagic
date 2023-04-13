@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:keybinder/keybinder.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:universal_platform/universal_platform.dart';
 
-void main() => runApp(const SignUpApp());
+void main() => runApp(const MainApp());
 
 void gracefuleExit() {
   exit(0);
@@ -37,24 +38,26 @@ void desktopBindingExit() {
   }
 }
 
-class SignUpApp extends StatelessWidget {
-  const SignUpApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     desktopBindingExit();
 
-    return MaterialApp(
-      routes: {
-        '/': (context) => const SignUpScreen(),
-      },
-      localizationsDelegates: const [
+    return const MaterialApp(
+      title: "wow",
+      home: MainScreen(),
+      // routes: {
+      //   '/': (context) => const MainScreen(),
+      // },
+      localizationsDelegates: [
         AppLocalizations.delegate, // Add this line
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
+      supportedLocales: [
         Locale('en'), // English
         Locale('zh'), // Chinese
       ],
@@ -62,95 +65,130 @@ class SignUpApp extends StatelessWidget {
   }
 }
 
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MainScreenState();
+  }
+}
+
+class _MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin, RestorationMixin {
+  TabController? _tabController;
+
+  final tabs = [
+    'red',
+    'yellow',
+  ];
+
+  final RestorableInt tabIndex = RestorableInt(0);
+
+  @override
+  String get restorationId => 'tab_scrollable_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(tabIndex, 'tab_index');
+    _tabController!.index = tabIndex.value;
+  }
+
+  @override
+  void initState() {
+    _tabController = TabController(
+      initialIndex: 0,
+      length: tabs.length,
+      vsync: this,
+    );
+    _tabController!.addListener(() {
+      // When the tab controller's value is updated, make sure to update the
+      // tab index value, which is state restorable.
+      setState(() {
+        tabIndex.value = _tabController!.index;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    tabIndex.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: Colors.grey[200],
-      body: const Center(
-        child: SizedBox(
-          width: 400,
-          child: Card(
-            child: SignUpForm(),
-          ),
+      body: Semantics(
+        container: true,
+      ),
+      floatingActionButton: Semantics(
+        container: true,
+        sortKey: const OrdinalSortKey(0),
+        child: FloatingActionButton(
+          onPressed: () {},
+          tooltip: localizations.search,
+          child: const Icon(Icons.search),
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: const _DemoBottomAppBar(
+        fabLocation: FloatingActionButtonLocation.centerDocked,
+        shape: CircularNotchedRectangle(),
+      ),
+      appBar: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        tabs: [Tab(text: 'red'), Tab(text: 'yellow')],
       ),
     );
   }
 }
 
-class SignUpForm extends StatefulWidget {
-  const SignUpForm({super.key});
+// https://github.com/flutter/gallery/blob/b9a231cab02d4c5fcf72e2538a5bf591aa514f01/lib/demos/material/bottom_app_bar_demo.dart#L150
+class _DemoBottomAppBar extends StatelessWidget {
+  const _DemoBottomAppBar({
+    required this.fabLocation,
+    this.shape,
+  });
 
-  @override
-  State<SignUpForm> createState() => _SignUpFormState();
-}
-
-class _SignUpFormState extends State<SignUpForm> {
-  final _firstNameTextController = TextEditingController();
-  final _lastNameTextController = TextEditingController();
-  final _usernameTextController = TextEditingController();
-
-  final double _formProgress = 0;
+  final FloatingActionButtonLocation fabLocation;
+  final NotchedShape? shape;
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return Form(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          LinearProgressIndicator(value: _formProgress),
-          Text(localizations.signUp,
-              style: Theme.of(context).textTheme.headlineMedium),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _firstNameTextController,
-              decoration: InputDecoration(hintText: localizations.firstName),
-            ),
+
+    return Semantics(
+      sortKey: const OrdinalSortKey(1),
+      container: true,
+      child: BottomAppBar(
+        shape: shape,
+        child: IconTheme(
+          data: const IconThemeData(color: Colors.lightBlue),
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: localizations.settings,
+                icon: const Icon(Icons.settings),
+                onPressed: () {},
+              ),
+              const Spacer(),
+              IconButton(
+                tooltip: localizations.love,
+                icon: const Icon(Icons.favorite),
+                onPressed: () {},
+              )
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _lastNameTextController,
-              decoration: InputDecoration(hintText: localizations.lastName),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _usernameTextController,
-              decoration: InputDecoration(hintText: localizations.userName),
-            ),
-          ),
-          TextButton(
-            style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.resolveWith(
-                  (Set<MaterialState> states) {
-                return states.contains(MaterialState.disabled)
-                    ? null
-                    : Colors.white;
-              }),
-              backgroundColor: MaterialStateProperty.resolveWith(
-                  (Set<MaterialState> states) {
-                return states.contains(MaterialState.disabled)
-                    ? null
-                    : Colors.blue;
-              }),
-            ),
-            onPressed: () {
-              if (kDebugMode) {
-                print(_firstNameTextController.text);
-                print(_lastNameTextController.text);
-                print(_usernameTextController.text);
-              }
-            },
-            child: Text(localizations.signUp),
-          ),
-        ],
+        ),
       ),
     );
   }
