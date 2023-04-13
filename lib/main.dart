@@ -13,11 +13,12 @@ void gracefuleExit() {
   exit(0);
 }
 
-class SignUpApp extends StatelessWidget {
-  const SignUpApp({super.key});
+void desktopBindingExit() {
+  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+    return;
+  }
 
-  @override
-  Widget build(BuildContext context) {
+  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
     // Ctrl + Q
     Keybinder.bind(
         Keybinding.from(
@@ -34,6 +35,15 @@ class SignUpApp extends StatelessWidget {
     Keybinder.bind(
         Keybinding.from({LogicalKeyboardKey.altLeft, LogicalKeyboardKey.f4}),
         () => gracefuleExit());
+  }
+}
+
+class SignUpApp extends StatelessWidget {
+  const SignUpApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    desktopBindingExit();
 
     return MaterialApp(
       routes: {
