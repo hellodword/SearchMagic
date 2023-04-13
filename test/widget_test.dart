@@ -11,12 +11,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:search_magic/main.dart';
 
 void main() {
-  testWidgets('Demo', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('SignUpApp', (WidgetTester tester) async {
     await tester.pumpWidget(const SignUpApp());
+    await tester.pumpAndSettle();
 
-    expect(find.text('Sign up'), findsNWidgets(2));
-    expect(find.text('Sign in'), findsNothing);
+    await tester.binding.setLocale('en', 'US');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign Up'), findsNWidgets(2));
+    expect(find.text('Sign In'), findsNothing);
+
+    await tester.binding.setLocale('zh', 'CN');
+    await tester.pumpAndSettle();
+
+    expect(find.text('登录'), findsNWidgets(2));
+    expect(find.text('注销'), findsNothing);
+
+    await tester.binding.setLocale('fr', 'FR');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign Up'), findsNWidgets(2));
+    expect(find.text('Sign In'), findsNothing);
 
     await tester.enterText(find.byType(TextField).first, 'hi');
     await tester.pump();
