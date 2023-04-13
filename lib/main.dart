@@ -74,81 +74,46 @@ class MainScreen extends StatefulWidget {
   }
 }
 
-class _MainScreenState extends State<MainScreen>
-    with SingleTickerProviderStateMixin, RestorationMixin {
-  TabController? _tabController;
-
-  final RestorableInt tabIndex = RestorableInt(0);
-
-  @override
-  String get restorationId => 'tab_scrollable';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(tabIndex, 'tab_index');
-    _tabController!.index = tabIndex.value;
-  }
-
-  @override
-  void initState() {
-    _tabController = TabController(
-      initialIndex: 0,
-      length: 2, // tabs.length
-      vsync: this,
-    );
-    _tabController!.addListener(() {
-      // When the tab controller's value is updated, make sure to update the
-      // tab index value, which is state restorable.
-      setState(() {
-        tabIndex.value = _tabController!.index;
-      });
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _tabController!.dispose();
-    tabIndex.dispose();
-    super.dispose();
-  }
-
+class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
     final tabs = [
-      Tab(text: localizations.google),
-      Tab(text: localizations.github),
+      localizations.google,
+      localizations.github,
     ];
 
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: Colors.grey[200],
-      body: Semantics(
-        container: true,
-      ),
-      floatingActionButton: Semantics(
-        container: true,
-        sortKey: const OrdinalSortKey(0),
-        child: FloatingActionButton(
-          onPressed: () {},
-          tooltip: localizations.search,
-          child: const Icon(Icons.search),
+
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: Colors.grey[200],
+        body: TabBarView(
+          children: [for (final tab in tabs) Center(child: Text(tab))],
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const _DemoBottomAppBar(
-        fabLocation: FloatingActionButtonLocation.centerDocked,
-        shape: CircularNotchedRectangle(),
-      ),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: tabs,
+        floatingActionButton: Semantics(
+          container: true,
+          sortKey: const OrdinalSortKey(0),
+          child: FloatingActionButton(
+            onPressed: () {},
+            tooltip: localizations.search,
+            child: const Icon(Icons.search),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: const _DemoBottomAppBar(
+          fabLocation: FloatingActionButtonLocation.centerDocked,
+          shape: CircularNotchedRectangle(),
+        ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: TabBar(
+            isScrollable: true,
+            tabs: [for (final tab in tabs) Tab(text: tab)],
+          ),
         ),
       ),
     );
