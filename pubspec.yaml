@@ -39,6 +39,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  universal_platform: ^1.0.0+1
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:keybinder/keybinder.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 void main() => runApp(const SignUpApp());
 
@@ -14,11 +15,9 @@ void gracefuleExit() {
 }
 
 void desktopBindingExit() {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    return;
-  }
-
-  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+  if (UniversalPlatform.isLinux ||
+      UniversalPlatform.isMacOS ||
+      UniversalPlatform.isWindows) {
     // Ctrl + Q
     Keybinder.bind(
         Keybinding.from(
@@ -98,35 +97,33 @@ class _SignUpFormState extends State<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Form(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           LinearProgressIndicator(value: _formProgress),
-          Text(AppLocalizations.of(context)!.signUp,
+          Text(localizations.signUp,
               style: Theme.of(context).textTheme.headlineMedium),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _firstNameTextController,
-              decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.firstName),
+              decoration: InputDecoration(hintText: localizations.firstName),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _lastNameTextController,
-              decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.lastName),
+              decoration: InputDecoration(hintText: localizations.lastName),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _usernameTextController,
-              decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.userName),
+              decoration: InputDecoration(hintText: localizations.userName),
             ),
           ),
           TextButton(
@@ -151,7 +148,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 print(_usernameTextController.text);
               }
             },
-            child: Text(AppLocalizations.of(context)!.signUp),
+            child: Text(localizations.signUp),
           ),
         ],
       ),
