@@ -5,37 +5,37 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:search_magic/main.dart';
 
 void main() {
-  testWidgets('SignUpApp', (WidgetTester tester) async {
-    await tester.pumpWidget(const SignUpApp());
+  testWidgets('MainApp', (WidgetTester tester) async {
+    await tester.pumpWidget(const MainApp());
     await tester.pumpAndSettle();
 
     await tester.binding.setLocale('en', 'US');
     await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
 
-    expect(find.text('Sign Up'), findsNWidgets(2));
-    expect(find.text('Sign In'), findsNothing);
+    expect(find.text('Sign Up'), findsNothing);
+    expect(find.text('Google'), findsOneWidget);
 
     await tester.binding.setLocale('zh', 'CN');
     await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
 
-    expect(find.text('登录'), findsNWidgets(2));
-    expect(find.text('注销'), findsNothing);
+    expect(find.text('谷歌'), findsOneWidget);
 
     await tester.binding.setLocale('fr', 'FR');
     await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
 
-    expect(find.text('Sign Up'), findsNWidgets(2));
-    expect(find.text('Sign In'), findsNothing);
+    expect(find.text('Google'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'hi');
-    await tester.pump();
+    // await tester.enterText(find.byType(TextField).first, 'hi');
+    // await tester.pump();
 
-    expect(find.text('hi'), findsOneWidget);
+    // expect(find.text('hi'), findsOneWidget);
   });
 }

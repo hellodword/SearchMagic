@@ -46,7 +46,7 @@ class MainApp extends StatelessWidget {
     desktopBindingExit();
 
     return const MaterialApp(
-      title: "wow",
+      title: "Search Magic",
       home: MainScreen(),
       // routes: {
       //   '/': (context) => const MainScreen(),
@@ -78,15 +78,10 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin, RestorationMixin {
   TabController? _tabController;
 
-  final tabs = [
-    'red',
-    'yellow',
-  ];
-
   final RestorableInt tabIndex = RestorableInt(0);
 
   @override
-  String get restorationId => 'tab_scrollable_demo';
+  String get restorationId => 'tab_scrollable';
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
@@ -98,7 +93,7 @@ class _MainScreenState extends State<MainScreen>
   void initState() {
     _tabController = TabController(
       initialIndex: 0,
-      length: tabs.length,
+      length: 2, // tabs.length
       vsync: this,
     );
     _tabController!.addListener(() {
@@ -122,6 +117,11 @@ class _MainScreenState extends State<MainScreen>
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
+    final tabs = [
+      Tab(text: localizations.google),
+      Tab(text: localizations.github),
+    ];
+
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
@@ -143,10 +143,13 @@ class _MainScreenState extends State<MainScreen>
         fabLocation: FloatingActionButtonLocation.centerDocked,
         shape: CircularNotchedRectangle(),
       ),
-      appBar: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        tabs: [Tab(text: 'red'), Tab(text: 'yellow')],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabs: tabs,
+        ),
       ),
     );
   }
