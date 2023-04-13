@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keybinder/keybinder.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() => runApp(const SignUpApp());
 
@@ -37,6 +39,16 @@ class SignUpApp extends StatelessWidget {
       routes: {
         '/': (context) => const SignUpScreen(),
       },
+      localizationsDelegates: const [
+        AppLocalizations.delegate, // Add this line
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('zh'), // Chinese
+      ],
     );
   }
 }
@@ -81,26 +93,30 @@ class _SignUpFormState extends State<SignUpForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           LinearProgressIndicator(value: _formProgress),
-          Text('Sign up', style: Theme.of(context).textTheme.headlineMedium),
+          Text(AppLocalizations.of(context)!.signUp,
+              style: Theme.of(context).textTheme.headlineMedium),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _firstNameTextController,
-              decoration: const InputDecoration(hintText: 'First name'),
+              decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.firstName),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _lastNameTextController,
-              decoration: const InputDecoration(hintText: 'Last name'),
+              decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.lastName),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _usernameTextController,
-              decoration: const InputDecoration(hintText: 'Username'),
+              decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.userName),
             ),
           ),
           TextButton(
@@ -125,7 +141,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 print(_usernameTextController.text);
               }
             },
-            child: const Text('Sign up'),
+            child: Text(AppLocalizations.of(context)!.signUp),
           ),
         ],
       ),
