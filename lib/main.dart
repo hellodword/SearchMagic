@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 void main() => runApp(const MainApp());
 
@@ -148,7 +148,6 @@ class MainScreen extends StatelessWidget {
         builder: (context) {
           return Scaffold(
             key: scaffoldKey,
-            // backgroundColor: Colors.grey[200],
             body: TabBarView(
               children: [
                 for (final tab in tabs)
@@ -158,16 +157,20 @@ class MainScreen extends StatelessWidget {
                         child: TextFormField(
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(),
-                            hintText: '要搜索的关键词',
+                            hintText: localizations.hintKeywordsToSearch,
                           ),
                           maxLines: 1,
                         )),
+                    //TODO date picker
                     if (tab.startDate) Text(tab.name),
+                    if (tab.endDate) Text(tab.name),
                     IconButton(
                       icon: Icon(tab.icon),
                       onPressed: () {
-                        print(
-                            tabs[DefaultTabController.of(context).index].base);
+                        if (kDebugMode) {
+                          print(tabs[DefaultTabController.of(context).index]
+                              .base);
+                        }
                       },
                     ),
                   ])

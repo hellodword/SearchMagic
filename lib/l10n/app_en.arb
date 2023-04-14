@@ -5,5 +5,6 @@
   "google": "Google",
   "github": "Github",
   "darkMode": "Dark Mode",
-  "lightMode": "Light Mode"
+  "lightMode": "Light Mode",
+  "hintKeywordsToSearch": "Keywords to search"
 }
