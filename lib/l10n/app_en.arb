@@ -3,5 +3,7 @@
   "love": "Love",
   "settings": "Settings",
   "google": "Google",
-  "github": "Github"
+  "github": "Github",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode"
 }

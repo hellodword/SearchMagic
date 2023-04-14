@@ -19,19 +19,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Sign Up'), findsNothing);
-    expect(find.text('Google'), findsNWidgets(2));
+    expect(find.byTooltip('Google'), findsOneWidget);
 
     await tester.binding.setLocale('zh', 'CN');
     await tester.pumpAndSettle();
     await tester.pumpAndSettle();
 
-    expect(find.text('谷歌'), findsNWidgets(2));
+    expect(find.byTooltip('谷歌'), findsOneWidget);
 
     await tester.binding.setLocale('fr', 'FR');
     await tester.pumpAndSettle();
     await tester.pumpAndSettle();
 
-    expect(find.text('Google'), findsNWidgets(2));
+    expect(find.byTooltip('Google'), findsOneWidget);
 
     // await tester.enterText(find.byType(TextField).first, 'hi');
     // await tester.pump();

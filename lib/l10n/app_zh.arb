@@ -3,5 +3,7 @@
   "love": "喜爱",
   "settings": "设置",
   "google": "谷歌",
-  "github": "Github"
+  "github": "Github",
+  "darkMode": "暗黑模式",
+  "lightMode": "明亮模式"
 }
