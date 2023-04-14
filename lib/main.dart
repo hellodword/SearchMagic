@@ -45,14 +45,12 @@ class MainApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _MainAppState();
 
-  /// InheritedWidget style accessor to our State object.
-  /// We can call this static method from any descendant context to find our
-  /// State object and switch the themeMode field value & call for a rebuild.
   static _MainAppState of(BuildContext context) =>
       context.findAncestorStateOfType<_MainAppState>()!;
 }
 
 class _MainAppState extends State<MainApp> {
+  // https://stackoverflow.com/a/62607827
   ThemeMode _themeMode = ThemeMode.system;
 
   @override
@@ -60,34 +58,21 @@ class _MainAppState extends State<MainApp> {
     desktopBindingExit();
 
     return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.light,
-        /* light theme settings */
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        /* dark theme settings */
-      ),
+      theme: ThemeData(brightness: Brightness.light),
+      darkTheme: ThemeData(brightness: Brightness.dark),
       themeMode: _themeMode,
-      /* ThemeMode.system to follow system theme, 
-         ThemeMode.light for light theme, 
-         ThemeMode.dark for dark theme
-      */
       debugShowCheckedModeBanner: false,
       title: 'Search Magic',
       home: const MainScreen(),
-      // routes: {
-      //   '/': (context) => const MainScreen(),
-      // },
       localizationsDelegates: const [
-        AppLocalizations.delegate, // Add this line
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en'), // English
-        Locale('zh'), // Chinese
+        Locale('en'),
+        Locale('zh'),
       ],
     );
   }
