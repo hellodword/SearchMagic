@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.search_magic">
    <application
-        android:label="search_magic"
+        android:label="Search Magic"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
