@@ -41,6 +41,7 @@ dependencies:
   intl: any
   universal_platform: ^1.0.0+1
   material_design_icons_flutter: ^6.0.7096
+  syncfusion_flutter_datepicker: ^21.1.39
 
 dev_dependencies:
   flutter_test:

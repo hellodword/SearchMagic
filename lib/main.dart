@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:universal_platform/universal_platform.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 void main() => runApp(const MainApp());
 
@@ -73,7 +74,7 @@ class _MainAppState extends State<MainApp> {
          ThemeMode.dark for dark theme
       */
       debugShowCheckedModeBanner: false,
-      title: "Search Magic",
+      title: 'Search Magic',
       home: const MainScreen(),
       // routes: {
       //   '/': (context) => const MainScreen(),
@@ -101,7 +102,17 @@ class _MainAppState extends State<MainApp> {
 class TabData {
   String name;
   IconData icon;
-  TabData({required this.name, required this.icon});
+  String base;
+  bool startDate;
+  bool endDate;
+
+  TabData({
+    required this.name,
+    required this.icon,
+    required this.base,
+    required this.startDate,
+    required this.endDate,
+  });
 }
 
 class MainScreen extends StatelessWidget {
@@ -112,47 +123,86 @@ class MainScreen extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
 
     final tabs = [
-      TabData(name: localizations.google, icon: MdiIcons.google),
-      TabData(name: localizations.github, icon: MdiIcons.github),
+      TabData(
+        name: localizations.google,
+        icon: MdiIcons.google,
+        base: 'https://www.google.com',
+        startDate: true,
+        endDate: true,
+      ),
+      TabData(
+        name: localizations.github,
+        icon: MdiIcons.github,
+        base: 'https://www.github.com',
+        startDate: false,
+        endDate: false,
+      ),
     ];
 
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return DefaultTabController(
       length: tabs.length,
-      child: Scaffold(
-        key: scaffoldKey,
-        // backgroundColor: Colors.grey[200],
-        body: TabBarView(
-          children: [for (final tab in tabs) Center(child: Icon(tab.icon))],
-        ),
-        floatingActionButton: Semantics(
-          container: true,
-          sortKey: const OrdinalSortKey(0),
-          child: FloatingActionButton(
-            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey
-                : Colors.lightBlue,
-            onPressed: () {},
-            tooltip: localizations.search,
-            child: const Icon(Icons.search),
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: const _DemoBottomAppBar(
-          fabLocation: FloatingActionButtonLocation.centerDocked,
-          shape: CircularNotchedRectangle(),
-        ),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: TabBar(
-            isScrollable: true,
-            tabs: [
-              for (final tab in tabs)
-                Tooltip(message: tab.name, child: Tab(icon: Icon(tab.icon)))
-            ],
-          ),
-        ),
+      // https://stackoverflow.com/a/52505320
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            key: scaffoldKey,
+            // backgroundColor: Colors.grey[200],
+            body: TabBarView(
+              children: [
+                for (final tab in tabs)
+                  Column(children: [
+                    Container(
+                        margin: const EdgeInsets.all(10.0),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: '要搜索的关键词',
+                          ),
+                          maxLines: 1,
+                        )),
+                    if (tab.startDate) Text(tab.name),
+                    IconButton(
+                      icon: Icon(tab.icon),
+                      onPressed: () {
+                        print(
+                            tabs[DefaultTabController.of(context).index].base);
+                      },
+                    ),
+                  ])
+              ],
+            ),
+            floatingActionButton: Semantics(
+              container: true,
+              sortKey: const OrdinalSortKey(0),
+              child: FloatingActionButton(
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey
+                    : Colors.lightBlue,
+                onPressed: () {},
+                tooltip: localizations.search,
+                child: const Icon(Icons.search),
+              ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            bottomNavigationBar: const _DemoBottomAppBar(
+              fabLocation: FloatingActionButtonLocation.centerDocked,
+              shape: CircularNotchedRectangle(),
+            ),
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: TabBar(
+                isScrollable: true,
+                tabs: [
+                  for (final tab in tabs)
+                    Tooltip(message: tab.name, child: Tab(icon: Icon(tab.icon)))
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
