@@ -6,5 +6,7 @@
   "github": "Github",
   "darkMode": "暗黑模式",
   "lightMode": "明亮模式",
-  "hintKeywordsToSearch": "要搜索的关键词"
+  "hintKeywordsToSearch": "要搜索的关键词",
+  "pickBeginDate": "选择起始日期",
+  "pickEndDate": "选择结束日期"
 }

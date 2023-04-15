@@ -1,14 +1,15 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:keybinder/keybinder.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:universal_platform/universal_platform.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(const MainApp());
 
@@ -17,9 +18,7 @@ void gracefuleExit() {
 }
 
 void desktopBindingExit() {
-  if (UniversalPlatform.isLinux ||
-      UniversalPlatform.isMacOS ||
-      UniversalPlatform.isWindows) {
+  if (UniversalPlatform.isDesktop) {
     // Ctrl + Q
     Keybinder.bind(
         Keybinding.from(
@@ -85,23 +84,84 @@ class _MainAppState extends State<MainApp> {
 }
 
 class TabData {
+  String key;
   String name;
   IconData icon;
   String base;
   bool startDate;
   bool endDate;
+  String searchTemplate;
 
   TabData({
+    required this.key,
     required this.name,
     required this.icon,
     required this.base,
     required this.startDate,
     required this.endDate,
+    required this.searchTemplate,
   });
 }
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  DateTime? _beginDate;
+  get beginDate => _beginDate;
+  set beginDate(startDate) => _beginDate = startDate;
+  DateTime? _endDate;
+  get endDate => _endDate;
+  set endDate(endDate) => _endDate = endDate;
+  TextEditingController keywords = TextEditingController();
+
+  void submit(TabData tab) {
+    if (keywords.text.isEmpty) {
+      return;
+    }
+    var uri = Uri.parse(tab.searchTemplate);
+    Map<String, String> query = {};
+    query.addAll(uri.queryParameters);
+
+    switch (tab.key) {
+      case 'google':
+        {
+          query.update('q', (value) => keywords.text);
+
+          // tbs=cdr:1,cd_min:4/2/2023,cd_max:4/14/2023
+          query.putIfAbsent(
+            'tbs',
+            () => 'cdr:1,cd_min:'
+                '${beginDate == null ? '' : DateFormat('M/d/yyyy').format(beginDate)}'
+                ',cd_max:'
+                '${endDate == null ? '' : DateFormat('M/d/yyyy').format(endDate)}',
+          );
+
+          // lr=lang_en|lang_zh-CN|lang_zh-TW
+
+          // safe=active
+          // safe=images
+
+          break;
+        }
+      case 'github':
+        {
+          query.update('q', (value) => keywords.text);
+          break;
+        }
+    }
+
+    uri = uri.replace(queryParameters: query);
+
+    // TODO history
+
+    // TODO choose browsers
+    launchUrl(uri);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,18 +169,23 @@ class MainScreen extends StatelessWidget {
 
     final tabs = [
       TabData(
+        key: 'google',
         name: localizations.google,
         icon: MdiIcons.google,
         base: 'https://www.google.com',
         startDate: true,
         endDate: true,
+        searchTemplate:
+            'https://www.google.com/search?q=%s&newwindow=1&pws=0&gl=us&gws_rd=cr',
       ),
       TabData(
+        key: 'github',
         name: localizations.github,
         icon: MdiIcons.github,
         base: 'https://www.github.com',
         startDate: false,
         endDate: false,
+        searchTemplate: 'https://github.com/search?q=%s&ref=opensearch',
       ),
     ];
 
@@ -140,24 +205,85 @@ class MainScreen extends StatelessWidget {
                     Container(
                         margin: const EdgeInsets.all(10.0),
                         child: TextFormField(
+                          controller: keywords,
+                          // Enter
+                          onFieldSubmitted: (value) {
+                            submit(
+                                tabs[DefaultTabController.of(context).index]);
+                          },
+                          autofocus: true,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(),
                             hintText: localizations.hintKeywordsToSearch,
                           ),
                           maxLines: 1,
                         )),
-                    //TODO date picker
-                    if (tab.startDate) Text(tab.name),
-                    if (tab.endDate) Text(tab.name),
-                    IconButton(
-                      icon: Icon(tab.icon),
-                      onPressed: () {
-                        if (kDebugMode) {
-                          print(tabs[DefaultTabController.of(context).index]
-                              .base);
-                        }
-                      },
-                    ),
+                    if (tab.startDate)
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey
+                                    : Colors.lightBlue,
+                              ),
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate:
+                                      DateTime.fromMillisecondsSinceEpoch(0),
+                                  lastDate: DateTime.now()
+                                      .add(const Duration(days: 1)),
+                                ).then((DateTime? value) {
+                                  setState(() => beginDate = value);
+                                });
+                              },
+                              child: Text(
+                                beginDate == null
+                                    ? localizations.pickBeginDate
+                                    : DateFormat('yyyy-MM-dd')
+                                        .format(beginDate),
+                              ),
+                            ),
+                            // if (tab.endDate) const SizedBox(width: 10),
+                            if (tab.endDate)
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.grey
+                                          : Colors.lightBlue,
+                                ),
+                                onPressed: () {
+                                  showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate:
+                                        DateTime.fromMillisecondsSinceEpoch(0),
+                                    lastDate: DateTime.now()
+                                        .add(const Duration(days: 1)),
+                                  ).then((DateTime? value) {
+                                    setState(() => endDate = value);
+                                  });
+                                },
+                                child: Text(endDate == null
+                                    ? localizations.pickEndDate
+                                    : DateFormat('yyyy-MM-dd').format(endDate)),
+                              ),
+                          ],
+                        ),
+                      ),
+                    // IconButton(
+                    //   icon: Icon(tab.icon),
+                    //   onPressed: () {},
+                    // ),
                   ])
               ],
             ),
@@ -168,7 +294,9 @@ class MainScreen extends StatelessWidget {
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
                     ? Colors.grey
                     : Colors.lightBlue,
-                onPressed: () {},
+                onPressed: () {
+                  submit(tabs[DefaultTabController.of(context).index]);
+                },
                 tooltip: localizations.search,
                 child: const Icon(Icons.search),
               ),
