@@ -3,9 +3,9 @@
 set -e
 set -x
 
-APP_NAME='Search Magic'
+APP_NAME='SearchMagic'
 
-flutter pub global run rename --bundleId hellodword.search_magic
+flutter pub global run rename --bundleId hellodword.searchmagic
 
 flutter pub global run rename --appname "$APP_NAME" --target ios
 flutter pub global run rename --appname "$APP_NAME" --target android
